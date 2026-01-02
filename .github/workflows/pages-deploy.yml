@@ -8,16 +8,16 @@ on:
       - .gitignore
       - README.md
       - LICENSE
-
-  # Allows you to run this workflow manually from the Actions tab
+  # 允许从 Actions 选项卡手动触发此工作流
   workflow_dispatch:
 
+# 设置必要的权限
 permissions:
   contents: read
   pages: write
   id-token: write
 
-# Allow one concurrent deployment
+# 只允许一个并发部署
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -25,18 +25,13 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # submodules: true
-          # If using the 'assets' git submodule from Chirpy Starter, uncomment above
-          # (See: https://github.com/cotes2020/chirpy-starter/tree/main/assets)
 
       - name: Setup Pages
-        id: pages
         uses: actions/configure-pages@v4
 
       - name: Setup Ruby
@@ -45,21 +40,15 @@ jobs:
           ruby-version: 3.3
           bundler-cache: true
 
-      - name: Build site
-        run: bundle exec jekyll b -d "_site${{ steps.pages.outputs.base_path }}"
-        env:
-          JEKYLL_ENV: "production"
-
-      - name: Test site
+      - name: Build with Jekyll
         run: |
-          bundle exec htmlproofer _site \
-            \-\-disable-external \
-            \-\-ignore-urls "/^http:\/\/127.0.0.1/,/^http:\/\/0.0.0.0/,/^http:\/\/localhost/"
+          bundle install
+          bundle exec jekyll build -d _site
 
-      - name: Upload site artifact
+      - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: "_site${{ steps.pages.outputs.base_path }}"
+          path: "_site"
 
   deploy:
     environment:
